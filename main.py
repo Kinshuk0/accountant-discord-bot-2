@@ -19,7 +19,7 @@ load_dotenv()
 
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-engine = create_engine("postgresql://doadmin:kiqsBNTds0PV7JgE@db-postgresql-nyc3-22503-do-user-10924482-0.b.db.ondigitalocean.com:25060/defaultdb", echo=False)
+engine = create_engine(os.getenv("DATABASE_URL"), echo=False)
 Base = declarative_base()
 
 
@@ -81,6 +81,10 @@ async def on_guild_join(guild):
     description = """I am your wallet accountant bot. Send your ethereum wallet addresses in this channel to get them whitelisted!
 
 Admins can use the `!wallets` command to retrieve the wallets data in a well-formatted csv.
+
+Once you submit the wallet you shall be given the role `'Wallet Recorded'`
+
+Note to Admins : Please make sure the role of the bot is above the role `'Wallet Recorded'` else it will not function.
 
 **PS - DO NOT RENAME/REMOVE THIS CHANNEL.**"""
     embed = discord.Embed(
@@ -182,8 +186,14 @@ async def on_message(message):
                         timestamp=datetime.utcnow()
                     )
                     # getrolebyname
-                    role = get(member.server.roles, name=ROLE_NAME)
-                    member = message.author
+                    ctx = await bot.get_context(message)
+                    member = ctx.message.author
+                    role = get(ctx.guild.roles, name=ROLE_NAME)
+                   # member = ctx.message.author
+
+                   # role = discord.utils.get(lambda role: role.name == ROLE_NAME, ctx.guild.roles)
+		    
+                    #  member = message.author
                     # addrole
                     await member.add_roles(role)
                     msg = await message.channel.send(embed=embed)
