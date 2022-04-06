@@ -211,6 +211,10 @@ async def on_message(message):
                         description=f"Gotchu {message.author.mention}! Your wallet address for mints has been recorded (`{wl_address}`)",
                         timestamp=datetime.utcnow()
                     )
+                    ctx = await bot.get_context(message)
+                    member = ctx.message.author
+                    role = get(ctx.guild.roles, name=ROLE_NAME)
+                    await member.add_roles(role)
                     msg = await message.channel.send(embed=embed)
                 
                 await asyncio.sleep(4)
